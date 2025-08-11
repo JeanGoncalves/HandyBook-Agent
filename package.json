@@ -1,0 +1,42 @@
+{
+  "name": "handybook-agent",
+  "version": "1.0.0",
+  "description": "Concierge de serviços para profissionais (manicure, mecânico, pedreiro). Busca por localização, preço e avaliação; consulta agendas; cria/edita/cancela reservas; solicita orçamentos; registra avaliações.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "watch": "nodemon --exec ts-node src/index.ts",
+    "clean": "rm -rf dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JeanGoncalves/HandyBook-Agent.git"
+  },
+  "keywords": [
+    "concierge",
+    "servicos",
+    "profissionais",
+    "manicure",
+    "mecanico",
+    "pedreiro",
+    "agenda",
+    "reservas",
+    "orcamentos"
+  ],
+  "author": "Jean Gonçalves",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JeanGoncalves/HandyBook-Agent/issues"
+  },
+  "homepage": "https://github.com/JeanGoncalves/HandyBook-Agent#readme",
+  "devDependencies": {
+    "@types/node": "^24.5.0",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
