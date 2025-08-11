@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { Runner, user } from '@openai/agents'
-import { createHandybookAgentWithMCP } from '../services/agentWithMcp'
+import { createHandybookAgent } from '../services/agentWithTools'
 import { generateConversationId, getHistory, setHistory } from '../services/conversationStore'
 
 export const agentRoutes = Router()
@@ -14,7 +14,7 @@ agentRoutes.post('/agent', async (req, res) => {
     }
     // Fallback removido: sempre usar o agente com MCP
 
-    const { agent, mcpServer } = await createHandybookAgentWithMCP()
+    const { agent } = await createHandybookAgent()
     try {
       // Recupera histórico existente e adiciona a nova entrada do usuário
       const history = getHistory(conversationId)
@@ -34,7 +34,7 @@ agentRoutes.post('/agent', async (req, res) => {
         history: result.history,
       })
     } finally {
-      await mcpServer.close()
+      // nada a fechar: tools em-processo
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
