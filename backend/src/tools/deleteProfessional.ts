@@ -1,11 +1,11 @@
 import { tool } from '@openai/agents'
-import { z } from 'zod'
+import { deleteProfessionalParams } from './schemas'
 import { getBaseUrl } from './helpers'
 
 export const deleteProfessionalTool = tool({
   name: 'delete_professional',
   description: 'Remove um profissional por ID',
-  parameters: z.object({ id: z.number() }),
+  parameters: deleteProfessionalParams,
   execute: async ({ id }) => {
     const fetchFn: any = (globalThis as any).fetch
     const url = new URL(`/professionals/${id}`, getBaseUrl()).toString()

@@ -1,9 +1,5 @@
 import { Agent } from '@openai/agents'
-import { helloTool } from '../tools/hello'
-import { searchProfessionalsTool } from '../tools/searchProfessionals'
-import { createProfessionalTool } from '../tools/createProfessional'
-import { updateProfessionalTool } from '../tools/updateProfessional'
-import { deleteProfessionalTool } from '../tools/deleteProfessional'
+import { helloTool, searchProfessionalsTool, createProfessionalTool, updateProfessionalTool, deleteProfessionalTool } from '../tools'
 
 export async function createHandybookAgent() {
   const agent = new Agent({
