@@ -41,5 +41,3 @@ export async function requestJson(method: string, path: string, body?: unknown):
     return { ok: false, status: 0, text: `Falha na requisição: ${msg}` }
   }
 }
-
-

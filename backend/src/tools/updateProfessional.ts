@@ -16,5 +16,3 @@ export const updateProfessionalTool = tool({
     return resp.text
   },
 })
-
-

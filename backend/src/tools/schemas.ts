@@ -13,30 +13,42 @@ export const searchProfessionalsParams = z.object({
 })
 
 export const createProfessionalParams = z.object({
-  name: z.string(),
+  name: z.string().describe('Nome do profissional'),
   services: z.array(professionalServices),
-  basePrice: z.number(),
-  rating: z.number().nullable(),
-  reviewCount: z.number().nullable(),
-  location: z.object({ lat: z.number(), lng: z.number() }),
-  city: z.string(),
-  workingHours: z.array(z.object({ day: z.string(), hours: z.string() })),
-  diary: z.array(z.object({ date: z.string(), time: z.string(), status: z.string() })).nullable(),
+  basePrice: z.number().describe('Preço base do profissional'),
+  rating: z.number().describe('Avaliação do profissional'),
+  reviewCount: z.number().describe('Quantidade de avaliações do profissional'),
+  location: z.object({ lat: z.number(), lng: z.number() }).describe('Localização do profissional'),
+  city: z.string().describe('Cidade do profissional'),
+  workingHours: z.array(z.object({ day: z.string().describe('Dia da semana'), hours: z.string().describe('Horário de atendimento') })).describe('Horários de atendimento do profissional'),
+  diary: z.array(z.object({
+    date: z.string().describe('Data do atendimento'),
+    time: z.string().describe('Horário do atendimento'),
+    status: z.enum(['available', 'not-available']).describe('Status do atendimento'),
+  })).describe('Diário de atendimento do profissional'),
 })
 
 export const updateProfessionalParams = z.object({
   id: z.number(),
-  name: z.string().nullable(),
-  services: z.array(professionalServices).nullable(),
-  basePrice: z.number().nullable(),
-  rating: z.number().nullable(),
-  reviewCount: z.number().nullable(),
-  location: z.object({ lat: z.number(), lng: z.number() }).nullable(),
-  city: z.string().nullable(),
-  workingHours: z.array(z.object({ day: z.string().nullable(), hours: z.string().nullable() })).nullable(),
-  diary: z.array(z.object({ date: z.string().nullable(), time: z.string().nullable(), status: z.string().nullable() })).nullable(),
+  name: z.string().describe('Nome do profissional'),
+  services: z.array(professionalServices).describe('Serviços do profissional'),
+  basePrice: z.number().describe('Preço base do profissional'),
+  rating: z.number().describe('Avaliação do profissional'),
+  reviewCount: z.number().describe('Quantidade de avaliações do profissional'),
+  location: z.object({
+    lat: z.number().describe('Latitude do profissional'),
+    lng: z.number().describe('Longitude do profissional'),
+  }).describe('Localização do profissional'),
+  city: z.string().describe('Cidade do profissional'),
+  workingHours: z.array(z.object({
+    day: z.string().describe('Dia da semana'),
+    hours: z.string().describe('Horário de atendimento'),
+  })).describe('Horários de atendimento do profissional'),
+  diary: z.array(z.object({
+    date: z.string().describe('Data do atendimento'),
+    time: z.string().describe('Horário do atendimento'),
+    status: z.enum(['available', 'not-available']).describe('Status do atendimento'),
+  })).describe('Diário de atendimento do profissional'),
 })
 
 export const deleteProfessionalParams = z.object({ id: z.number() })
-
-

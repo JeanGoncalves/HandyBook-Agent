@@ -13,6 +13,7 @@ const messages = ref<Message[]>([
 ])
 
 const draft = ref('')
+const conversationId = ref<string | null>(null)
 const isLoading = ref(false)
 const canSend = computed(() => draft.value.trim().length > 0)
 
@@ -38,6 +39,11 @@ function onDocumentClick(e: MouseEvent) {
 
 onMounted(async () => {
   document.addEventListener('click', onDocumentClick)
+  // Restaura convId salvo
+  try {
+    const saved = localStorage.getItem('hb_conversation_id')
+    if (saved) conversationId.value = saved
+  } catch {}
   await scrollToBottom()
 })
 
@@ -58,14 +64,18 @@ async function send() {
     const resp = await fetch(`${backendUrl}/api/agent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messageText: text }),
+      body: JSON.stringify({ messageText: text, conversationId: conversationId.value || undefined }),
     })
 
     if (!resp.ok) {
       throw new Error(`API error: ${resp.status}`)
     }
 
-    const data = await resp.json() as { finalOutput?: string; reply?: string }
+    const data = await resp.json() as { finalOutput?: string; reply?: string; conversationId?: string }
+    if (data.conversationId && data.conversationId !== conversationId.value) {
+      conversationId.value = data.conversationId
+      try { localStorage.setItem('hb_conversation_id', data.conversationId) } catch {}
+    }
     const reply = data.finalOutput ?? data.reply ?? 'Desculpe, não consegui responder agora.'
     messages.value.push({ role: 'assistant', content: reply, time: Date.now() })
   } catch (err) {
@@ -85,6 +95,9 @@ async function clearChat() {
   messages.value = [
     { role: 'assistant', content: 'Conversa limpa. Como posso ajudar?', time: Date.now() },
   ]
+  // Reinicia conversa para novo histórico
+  conversationId.value = null
+  try { localStorage.removeItem('hb_conversation_id') } catch {}
   await scrollToBottom()
 }
 

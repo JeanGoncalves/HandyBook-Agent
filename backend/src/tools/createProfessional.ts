@@ -12,5 +12,3 @@ export const createProfessionalTool = tool({
     return resp.text
   },
 })
-
-

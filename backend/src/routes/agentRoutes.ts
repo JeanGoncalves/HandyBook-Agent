@@ -12,6 +12,10 @@ agentRoutes.post('/agent', async (req, res) => {
     if (!conversationId) {
       conversationId = generateConversationId()
     }
+    // Log entrada do usuário
+    console.log(
+      `[agent] incoming | ts=${new Date().toISOString()} | conv=${conversationId} | user="${input}"`
+    )
     // Fallback removido: sempre usar o agente com MCP
 
     const { agent } = await createHandybookAgent()
@@ -33,11 +37,22 @@ agentRoutes.post('/agent', async (req, res) => {
         newItems: result.newItems,
         history: result.history,
       })
+
+      // Log saída do assistente
+      const out = typeof result.finalOutput === 'string' ? result.finalOutput : String(result.finalOutput)
+      const preview = out.length > 300 ? `${out.slice(0, 300)}…` : out
+      console.log(
+        `[agent] outgoing | ts=${new Date().toISOString()} | conv=${conversationId} | assistant="${preview}"
+[agent] items=${Array.isArray(result.newItems) ? result.newItems.length : 0}`
+      )
     } finally {
       // nada a fechar: tools em-processo
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
+    console.error(
+      `[agent] error   | ts=${new Date().toISOString()} | err=${msg}`
+    )
     res.status(500).json({ message: 'Erro ao executar agente com MCP', error: msg })
   }
 })

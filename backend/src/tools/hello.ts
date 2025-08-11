@@ -7,5 +7,3 @@ export const helloTool = tool({
   parameters: helloParams,
   execute: async ({ name }) => `Olá, ${name}! Ferramentas diretas no agente ativas.`,
 })
-
-

@@ -19,5 +19,3 @@ export const searchProfessionalsTool = tool({
     return resp.text
   },
 })
-
-
