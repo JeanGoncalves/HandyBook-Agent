@@ -4,12 +4,14 @@
   "description": "Concierge de serviços para profissionais (manicure, mecânico, pedreiro). Busca por localização, preço e avaliação; consulta agendas; cria/edita/cancela reservas; solicita orçamentos; registra avaliações.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "watch": "nodemon --exec ts-node src/index.ts",
-    "clean": "rm -rf dist",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:back": "npm --prefix backend run build",
+    "build:front": "npm --prefix frontend run build",
+    "start": "concurrently -n back,front -c cyan,magenta \"npm run dev:back\" \"npm run dev:front\"",
+    "dev": "concurrently -n back,front -c cyan,magenta \"npm run dev:back\" \"npm run dev:front\"",
+    "dev:back": "npm --prefix backend run dev",
+    "dev:front": "npm --prefix frontend run dev",
+    "clean": "rm -rf dist backend/dist frontend/dist"
   },
   "repository": {
     "type": "git",
@@ -35,6 +37,7 @@
   "homepage": "https://github.com/JeanGoncalves/HandyBook-Agent#readme",
   "devDependencies": {
     "@types/node": "^24.5.0",
+    "concurrently": "^8.2.2",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"

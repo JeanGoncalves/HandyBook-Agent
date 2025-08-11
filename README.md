@@ -11,13 +11,19 @@
 - ⭐ **Sistema de avaliações** e reviews
 - 🎯 **Filtros inteligentes** por categoria de serviço
 
-## 🛠️ Categorias de Serviços
+## 🧩 Requisito para o agente (Gemini)
 
-- 💅 **Beleza** - Manicures, cabeleireiros, esteticistas
-- 🔧 **Mecânico** - Reparação de veículos, manutenção
-- 🏗️ **Construção** - Pedreiros, eletricistas, encanadores
-- 🧹 **Limpeza** - Faxineiros, jardineiros
-- 📦 **Outros** - Serviços diversos
+Para o chat do agente funcionar com a IA, é necessário configurar a chave de API do Google Gemini.
+
+1. Obtenha sua chave em: https://ai.google.dev/
+2. Crie o arquivo `backend/.env` com o conteúdo (use o modelo `backend/.env.example`):
+
+```
+GOOGLE_API_KEY=SEU_TOKEN_GEMINI
+# (opcional) GEMINI_API_KEY=SEU_TOKEN_GEMINI
+```
+
+Com isso, o backend usará o Gemini via LangChain.
 
 ## 🚀 Início Rápido
 
@@ -42,14 +48,16 @@ npm install
 ### Desenvolvimento
 
 ```bash
-# Executar em modo desenvolvimento
-npm run dev
+# Executar em modo desenvolvimento (frontend + backend)
+npm run dev:back
+npm run dev:front
 
-# Executar com hot-reload
+# Executar com hot-reload do app Node base (se aplicável)
 npm run watch
 
 # Build do projeto
-npm run build
+npm run build:back
+npm run build:front
 
 # Executar build
 npm start

@@ -13,10 +13,13 @@ const messages = ref<Message[]>([
 ])
 
 const draft = ref('')
+const isLoading = ref(false)
 const canSend = computed(() => draft.value.trim().length > 0)
 
 const menuOpen = ref(false)
 const menuRoot = ref<HTMLElement | null>(null)
+
+const backendUrl = (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3002'
 
 function toggleMenu() {
   menuOpen.value = !menuOpen.value
@@ -39,19 +42,36 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', onDocumentClick)
 })
 
-function send() {
+async function send() {
   const text = draft.value.trim()
-  if (!text) return
+  if (!text || isLoading.value) return
 
   messages.value.push({ role: 'user', content: text, time: Date.now() })
   draft.value = ''
-
-  setTimeout(() => {
-    messages.value.push({ role: 'assistant', content: 'Entendi. Em breve vou integrar com o mock-api para buscar profissionais e mostrar resultados aqui no chat.', time: Date.now() })
-    scrollToBottom()
-  }, 500)
-
+  isLoading.value = true
   scrollToBottom()
+
+  try {
+    const history = messages.value.map(({ role, content }) => ({ role, content }))
+    const resp = await fetch(`${backendUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history }),
+    })
+
+    if (!resp.ok) {
+      throw new Error(`API error: ${resp.status}`)
+    }
+
+    const data = await resp.json() as { reply?: string }
+    const reply = data.reply ?? 'Desculpe, não consegui responder agora.'
+    messages.value.push({ role: 'assistant', content: reply, time: Date.now() })
+  } catch (err) {
+    messages.value.push({ role: 'assistant', content: 'Erro ao contatar o agente. Tente novamente.', time: Date.now() })
+  } finally {
+    isLoading.value = false
+    scrollToBottom()
+  }
 }
 
 function onClearConversation() {
@@ -101,6 +121,11 @@ function formatTime(ts: number) {
             <span class="block mt-1 text-[11px] opacity-70">{{ formatTime(m.time) }}</span>
           </div>
         </div>
+        <div v-if="isLoading" class="flex justify-start">
+          <div class="max-w-[80%] rounded-2xl px-4 py-2 shadow-sm bg-white text-gray-500 rounded-bl-sm border italic">
+            Digitando...
+          </div>
+        </div>
       </section>
 
       <form @submit.prevent="send" class="grid grid-cols-[1fr,auto] gap-2 items-end">
@@ -147,7 +172,7 @@ function formatTime(ts: number) {
 
         <button
           type="submit"
-          :disabled="!canSend"
+          :disabled="!canSend || isLoading"
           class="inline-flex items-center gap-2 rounded-xl bg-brand-600 text-white px-4 py-3 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-700"
         >
           Enviar
