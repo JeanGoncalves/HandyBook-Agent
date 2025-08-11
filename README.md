@@ -15,7 +15,7 @@
 
 Para o chat do agente funcionar com a IA, é necessário configurar a chave de API do Google Gemini.
 
-1. Obtenha sua chave em: https://ai.google.dev/
+1. Obtenha sua chave em: https://aistudio.google.com/apikey
 2. Crie o arquivo `backend/.env` com o conteúdo (use o modelo `backend/.env.example`):
 
 ```
