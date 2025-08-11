@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 
 type Role = 'user' | 'assistant'
 interface Message {
@@ -18,6 +18,8 @@ const canSend = computed(() => draft.value.trim().length > 0)
 
 const menuOpen = ref(false)
 const menuRoot = ref<HTMLElement | null>(null)
+const messagesRoot = ref<HTMLElement | null>(null)
+const bottomAnchor = ref<HTMLElement | null>(null)
 
 const backendUrl = (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3002'
 
@@ -34,8 +36,9 @@ function onDocumentClick(e: MouseEvent) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('click', onDocumentClick)
+  await scrollToBottom()
 })
 
 onBeforeUnmount(() => {
@@ -52,19 +55,18 @@ async function send() {
   scrollToBottom()
 
   try {
-    const history = messages.value.map(({ role, content }) => ({ role, content }))
-    const resp = await fetch(`${backendUrl}/api/chat`, {
+    const resp = await fetch(`${backendUrl}/api/agent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, history }),
+      body: JSON.stringify({ messageText: text }),
     })
 
     if (!resp.ok) {
       throw new Error(`API error: ${resp.status}`)
     }
 
-    const data = await resp.json() as { reply?: string }
-    const reply = data.reply ?? 'Desculpe, não consegui responder agora.'
+    const data = await resp.json() as { finalOutput?: string; reply?: string }
+    const reply = data.finalOutput ?? data.reply ?? 'Desculpe, não consegui responder agora.'
     messages.value.push({ role: 'assistant', content: reply, time: Date.now() })
   } catch (err) {
     messages.value.push({ role: 'assistant', content: 'Erro ao contatar o agente. Tente novamente.', time: Date.now() })
@@ -79,18 +81,35 @@ function onClearConversation() {
   menuOpen.value = false
 }
 
-function clearChat() {
+async function clearChat() {
   messages.value = [
     { role: 'assistant', content: 'Conversa limpa. Como posso ajudar?', time: Date.now() },
   ]
+  await scrollToBottom()
 }
 
-function scrollToBottom() {
-  requestAnimationFrame(() => {
-    const el = document.getElementById('messages')
-    if (el) el.scrollTop = el.scrollHeight
+async function scrollToBottom() {
+  await nextTick()
+  return new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      try {
+        bottomAnchor.value?.scrollIntoView({ block: 'end' })
+        const el = messagesRoot.value
+        if (el) el.scrollTop = el.scrollHeight
+      } finally {
+        resolve()
+      }
+    })
   })
 }
+
+watch(
+  () => [messages.value.length, isLoading.value],
+  async () => {
+    await scrollToBottom()
+  },
+  { immediate: true }
+)
 
 function formatTime(ts: number) {
   const d = new Date(ts)
@@ -111,7 +130,7 @@ function formatTime(ts: number) {
     </header>
 
     <main class="max-w-3xl w-full mx-auto px-4 py-6 grid grid-rows-[1fr,auto] gap-4">
-      <section id="messages" class="space-y-4 overflow-y-auto pr-1">
+      <section id="messages" ref="messagesRoot" class="space-y-4 overflow-y-auto pr-1">
         <div v-for="(m, idx) in messages" :key="idx" class="flex" :class="m.role === 'user' ? 'justify-end' : 'justify-start'">
           <div
             class="max-w-[80%] rounded-2xl px-4 py-2 shadow-sm"
@@ -126,6 +145,7 @@ function formatTime(ts: number) {
             Digitando...
           </div>
         </div>
+        <div ref="bottomAnchor" />
       </section>
 
       <form @submit.prevent="send" class="grid grid-cols-[1fr,auto] gap-2 items-end">

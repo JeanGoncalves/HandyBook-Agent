@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "HandyBook-Agent backend (Express + LangChain)",
+  "description": "HandyBook-Agent backend",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -14,15 +14,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "@langchain/google-genai": "^0.2.16",
-    "@langchain/openai": "^0.6.7",
+    "@openai/agents": "^0.0.15",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "langchain": "^0.3.30",
-    "openai": "^5.12.2",
-    "zod": "^3.25.76"
+    "express": "^5.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
